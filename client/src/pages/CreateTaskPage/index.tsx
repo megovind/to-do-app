@@ -1,10 +1,26 @@
-import React from 'react';
 import TaskForm from '../../components/TaskForm';
+import { QueryClient, useMutation } from '@tanstack/react-query';
+import { createTask } from '../../services/tasks';
+import { Task } from '../../utils/types';
+import { useNavigate } from '@tanstack/react-router';
 
-const CreateTaskPage: React.FC = () => {
-  const handleTaskSubmit = (task: { title: string; description: string; status: string }) => {
-    console.log('Task submitted:', task);
-    // Here you can handle the taskand  save it to a server
+const queryClient = new QueryClient();
+
+function CreateTaskPage() {
+  const navigate = useNavigate();
+  const { mutateAsync, error } = useMutation({
+    mutationFn: createTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    }
+  });
+  const handleTaskSubmit = async (task: Task) => {
+    await mutateAsync(task);
+    if (error) {
+      console.log('Error creating task:', error);
+      return;
+    }
+    navigate({ to: '/tasks' });
   };
 
   return (

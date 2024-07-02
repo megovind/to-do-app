@@ -3,12 +3,14 @@ import Input from '../common/Input';
 import Button from '../common/Button';
 import Dropdown from '../common/Dropdown';
 import { STATUS_TEXT_COLORS, TASK_STATUSES } from '../../utils/constants';
+import { useNavigate } from '@tanstack/react-router';
 
 interface TaskFormProps {
   onSubmit: (task: { title: string; description: string; status: string }) => void;
 }
 
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -97,7 +99,10 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
         />
         {errors.status && <p className="text-red-600 text-sm">{errors.status}</p>}
       </div>
-      <div className='flex justify-end'> 
+      <div className='flex justify-end space-x-4'>
+        <Button variant="danger" size="medium" onClick={() => navigate({to: '/tasks'})}>
+          Cancel
+        </Button>
         <Button type="submit" variant="primary" size="medium">
           Add Task
         </Button>

@@ -18,7 +18,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, value, onChange, className
     >
         {options.map((option, index) => (
           <option key={index} value={option}>
-            <span> {option} </span>
+            {option}
           </option>
         ))}
     </select>

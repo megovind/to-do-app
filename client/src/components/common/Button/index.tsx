@@ -1,11 +1,11 @@
 import React, { ReactNode, ButtonHTMLAttributes } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
+  children?: ReactNode;
   variant?: 'primary' | 'secondary' | 'danger' | 'link';
   size?: 'small' | 'medium' | 'large';
   icon?: ReactNode;
-  iconPosition?: 'left' | 'right';
+  iconPosition?: 'left' | 'right' | 'center';
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -13,7 +13,7 @@ const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'medium',
   icon,
-  iconPosition = 'left',
+  iconPosition = 'center',
   className = '',
   ...rest
 }) => {
@@ -36,6 +36,9 @@ const Button: React.FC<ButtonProps> = ({
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       {...rest}
     >
+      {icon && iconPosition === 'center' && (
+        <span className={`${icon ? 'inline-block' : 'hidden'}`}>{icon}</span>
+      )}
       {icon && iconPosition === 'left' && (
         <span className={`mr-2 ${icon ? 'inline-block' : 'hidden'}`}>{icon}</span>
       )}
