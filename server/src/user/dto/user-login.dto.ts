@@ -15,3 +15,9 @@ export class UserResponseDto {
   readonly username: string;
   readonly fullName: string;
 }
+
+export class UserDto {
+  readonly userId: string;
+  readonly username: string;
+  readonly fullName?: string;
+}

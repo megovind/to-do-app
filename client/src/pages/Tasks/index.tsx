@@ -3,10 +3,11 @@ import Button from '../../components/common/Button';
 import { useQuery } from '@tanstack/react-query';
 import { fetchTasks } from '../../services/tasks';
 import { useNavigate } from '@tanstack/react-router';
+import ErrorCard from '../../components/common/ErrorCard';
 
 function Tasks(){
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchTasks,
   });
@@ -22,7 +23,8 @@ function Tasks(){
               Add Task
             </Button>
           </div>
-          {isLoading && <p>Loading...</p>}
+            {isLoading && <p>Loading...</p>}
+            {error && <ErrorCard errorMessage={error.message} />}
             {data && <TaskList tasks={data} />}
         </div>
     </div>

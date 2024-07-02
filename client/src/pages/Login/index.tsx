@@ -14,7 +14,6 @@ function LoginPage() {
   });
 
   const handleLogin = async (username: string, password: string) => {
-    // Handle login logic here
     const response = await mutateAsync({ username: username, password: password });
     if (error) {
         console.log('login failed:', error);

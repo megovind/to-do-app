@@ -13,6 +13,14 @@ function App() {
     if (accessToken) setIsAuthentication(true)
   }, [accessToken])
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({to: '/tasks'})
+    } else {
+      navigate({to: '/login'})
+    }
+  }, [isAuthenticated, navigate])
+
   const onLogout = () => {
     clearAllLocalStorage();
     setIsAuthentication(false);

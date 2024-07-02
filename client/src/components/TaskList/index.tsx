@@ -1,12 +1,13 @@
 import React, { useState, ChangeEvent } from 'react';
 import Dropdown from '../common/Dropdown';
-import { STATUS_COLORS, STATUS_TEXT_COLORS, TASK_STATUSES } from '../../utils/constants';
-import Button from '../common/Button';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { STATUS_TEXT_COLORS, TASK_STATUSES } from '../../utils/constants';
 import { QueryClient, useMutation } from '@tanstack/react-query';
 import { deleteTask } from '../../services/tasks';
+import ConfirmDialog from '../common/ConfirmDialogue';
+import TaskCard from './task-card';
+import NoDataCard from '../common/NotFound';
 
-interface Task {
+export interface TaskResponse {
   _id: string;
   title: string;
   description: string;
@@ -14,13 +15,16 @@ interface Task {
 }
 
 interface TaskListProps {
-  tasks: Task[];
+  tasks: TaskResponse[];
 }
 
 const queryClient = new QueryClient();
 
 const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   const [filter, setFilter] = useState<string>('All');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
+
   const { mutateAsync, error } = useMutation({
     mutationFn: deleteTask,
     onSuccess: () => {
@@ -32,7 +36,8 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
   };
 
   const filteredTasks = filter === 'All' ? tasks : tasks.filter(task => task.status === filter);
-  const onDeleteTask = async (id: string) => {
+  const handleDelete = async () => {
+    const id =selectedTask ? selectedTask._id :'';
     await mutateAsync(id);
     if (error) {
       console.log('Error deleting task:', error);
@@ -40,6 +45,17 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
     }
     const taskIndex = tasks.findIndex(task => task._id ===id)
     tasks.splice(taskIndex, 1);
+    setIsDialogOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsDialogOpen(false);
+    setSelectedTask(null);
+  };
+
+  const openDialogue = (task: TaskResponse) => {
+    setIsDialogOpen(true);
+    setSelectedTask(task);
   }
 
   return (
@@ -53,23 +69,17 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
         />
       </div>
       <ul className="space-y-4">
-        {filteredTasks.map(task => (
-          <li key={task._id} className="p-4 bg-white rounded-lg shadow-md">
-            <div className='flex justify-between'>
-              <h3 className="text-lg font-semibold">{task.title}</h3>
-              <Button size='small' variant='link' icon={<TrashIcon className='h-5 w-5 text-red-500' />} onClick={() => onDeleteTask(task._id)} />
-            </div>
-            <p>{task.description}</p>
-            <div className='flex'>
-            {/* Status: */}
-            <div className={`items-center whitespace-nowrap rounded-lg py-1 px-2 font-sans text-xs uppercase text-white mt-2 ${STATUS_COLORS[task.status]}`}>
-              <span>{task.status}</span>
-            </div>
-            </div>
-            
-          </li>
-        ))}
+        {filteredTasks.length ? filteredTasks.map(task => (
+           <TaskCard task={task} openDialogue={(task) => openDialogue(task)} />
+        )) : <NoDataCard message='No Task is created Yet!' />}
       </ul>
+      <ConfirmDialog
+        isOpen={isDialogOpen}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this task?"
+        onConfirm={handleDelete}
+        onCancel={handleCancel}
+      />
     </div>
   );
 };
