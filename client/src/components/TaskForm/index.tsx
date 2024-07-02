@@ -3,7 +3,7 @@ import Input from '../common/Input';
 import Button from '../common/Button';
 import Dropdown from '../common/Dropdown';
 import { STATUS_TEXT_COLORS, TASK_STATUSES } from '../../utils/constants';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useParams } from '@tanstack/react-router';
 
 interface TaskFormProps {
   onSubmit: (task: { title: string; description: string; status: string }) => void;
@@ -11,10 +11,15 @@ interface TaskFormProps {
 
 const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
   const navigate = useNavigate();
+  const { task } = useParams({
+    strict: true,
+    from: undefined
+  });
+  const initialData = task ? JSON.parse(task) : undefined;
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    status: 'To Do',
+    title: initialData?.title || '',
+    description: initialData?.description || '',
+    status: initialData?.status || 'To Do',
   });
 
   const [errors, setErrors] = useState({
@@ -28,7 +33,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
     let isValid = true;
 
     if (!formData.title || formData.title.trim().split(' ').length < 2) {
-      tempErrors.title = 'Title must not be empty.';
+      tempErrors.title = 'Title must be at least 2 words.';
       isValid = false;
     }
 
@@ -57,12 +62,17 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit(formData);
-      setFormData({ title: '', description: '', status: 'To Do' });
+      const validFormData = initialData ? {...formData, ...{ id: initialData._id } } : formData;
+      onSubmit(validFormData);
+      if (!initialData) {
+        setFormData({ title: '', description: '', status: 'To Do' });
+      }
     }
   };
 
   return (
+    <>
+    <h1 className="text-2xl font-bold my-5 text-left">{initialData ? 'Update Task': 'Add Task'}</h1>
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
@@ -100,14 +110,15 @@ const TaskForm: React.FC<TaskFormProps> = ({ onSubmit }) => {
         {errors.status && <p className="text-red-600 text-sm">{errors.status}</p>}
       </div>
       <div className='flex justify-end space-x-4'>
-        <Button variant="danger" size="medium" onClick={() => navigate({to: '/tasks'})}>
+        <Button variant="danger" size="medium" onClick={() => navigate({ to: '/tasks' })}>
           Cancel
         </Button>
         <Button type="submit" variant="primary" size="medium">
-          Add Task
+          {initialData ? 'Update Task' : 'Add Task'}
         </Button>
       </div>
     </form>
+    </>
   );
 };
 

@@ -14,7 +14,7 @@ const Dropdown: React.FC<DropdownProps> = ({ options, value, onChange, className
       value={value}
       onChange={onChange}
       name={name}
-      className={`appearance-none border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 ${className}`}
+      className={`border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-600 ${className}`}
     >
         {options.map((option, index) => (
           <option key={index} value={option}>

@@ -6,6 +6,7 @@ import { deleteTask } from '../../services/tasks';
 import ConfirmDialog from '../common/ConfirmDialogue';
 import TaskCard from './task-card';
 import NoDataCard from '../common/NotFound';
+import { useNavigate } from '@tanstack/react-router';
 
 export interface TaskResponse {
   _id: string;
@@ -21,6 +22,7 @@ interface TaskListProps {
 const queryClient = new QueryClient();
 
 const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<string>('All');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskResponse | null>(null);
@@ -70,7 +72,12 @@ const TaskList: React.FC<TaskListProps> = ({ tasks }) => {
       </div>
       <ul className="space-y-4">
         {filteredTasks.length ? filteredTasks.map(task => (
-           <TaskCard task={task} openDialogue={(task) => openDialogue(task)} />
+          <TaskCard
+            key={task._id}
+            task={task}
+            openDialogue={(task) => openDialogue(task)}
+            updateTask={(task) => { navigate({to: `/update-task/${JSON.stringify(task)}` }) }}
+          />
         )) : <NoDataCard message='No Task is created Yet!' />}
       </ul>
       <ConfirmDialog

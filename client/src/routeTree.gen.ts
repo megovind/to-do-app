@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as TasksImport } from './routes/tasks'
 import { Route as LoginImport } from './routes/login'
 import { Route as CreateTaskImport } from './routes/create-task'
+import { Route as UpdateTaskTaskImport } from './routes/update-task.$task'
 
 // Create/Update Routes
 
@@ -29,6 +30,11 @@ const LoginRoute = LoginImport.update({
 
 const CreateTaskRoute = CreateTaskImport.update({
   path: '/create-task',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UpdateTaskTaskRoute = UpdateTaskTaskImport.update({
+  path: '/update-task/$task',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -57,6 +63,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TasksImport
       parentRoute: typeof rootRoute
     }
+    '/update-task/$task': {
+      id: '/update-task/$task'
+      path: '/update-task/$task'
+      fullPath: '/update-task/$task'
+      preLoaderRoute: typeof UpdateTaskTaskImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -66,6 +79,7 @@ export const routeTree = rootRoute.addChildren({
   CreateTaskRoute,
   LoginRoute,
   TasksRoute,
+  UpdateTaskTaskRoute,
 })
 
 /* prettier-ignore-end */
@@ -78,7 +92,8 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/create-task",
         "/login",
-        "/tasks"
+        "/tasks",
+        "/update-task/$task"
       ]
     },
     "/create-task": {
@@ -89,6 +104,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/tasks": {
       "filePath": "tasks.tsx"
+    },
+    "/update-task/$task": {
+      "filePath": "update-task.$task.tsx"
     }
   }
 }

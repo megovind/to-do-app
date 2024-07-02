@@ -1,6 +1,6 @@
 import TaskForm from '../../components/TaskForm';
 import { QueryClient, useMutation } from '@tanstack/react-query';
-import { createTask } from '../../services/tasks';
+import { createTask, editTask } from '../../services/tasks';
 import { Task } from '../../utils/types';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -14,9 +14,15 @@ function CreateTaskPage() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     }
   });
+  const { mutateAsync: updateTask, error: updateError } = useMutation({
+    mutationFn: editTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    }
+  });
   const handleTaskSubmit = async (task: Task) => {
-    await mutateAsync(task);
-    if (error) {
+   task.id ? await updateTask(task) : await mutateAsync(task);
+    if (error || updateError) {
       console.log('Error creating task:', error);
       return;
     }
@@ -27,7 +33,6 @@ function CreateTaskPage() {
     <div className='container mx-auto p-4'>
     <div className="flex items-center justify-center mt-20">
       <div className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold my-5 text-left">Add Task</h1>
         <TaskForm onSubmit={handleTaskSubmit} />
       </div>
     </div>
