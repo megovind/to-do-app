@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { UserIcon } from '@heroicons/react/24/outline';
-
 interface HeaderProps {
   isAuthenticated: boolean;
   onLogout: () => void;
